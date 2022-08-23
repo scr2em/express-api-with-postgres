@@ -7,7 +7,7 @@ CREATE TABLE products (
     id SERIAL PRIMARY KEY,
     name VARCHAR NOT NULL,
     price INT NOT NULL,
-    category_id INT NOT NULL REFERENCES categories (id),
+    category_id INT NOT NULL REFERENCES categories (id)
 );
 
 CREATE TABLE users (
@@ -24,5 +24,5 @@ CREATE TABLE orders (
     product_id INT NOT NULL REFERENCES products (id) ON DELETE CASCADE,
     quantity INT NOT NULL,
     user_id INT NOT NULL  REFERENCES users (id) ON DELETE CASCADE,
-    status order_status,
+    status order_status
 );
