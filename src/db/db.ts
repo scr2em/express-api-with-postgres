@@ -2,17 +2,23 @@ import {Pool} from "pg";
 
 
 const {
-    POSTGRES_DB,
     POSTGRES_HOST,
+    POSTGRES_DB,
     POSTGRES_USER,
-    POSTGRES_PASSWORD
+    POSTGRES_PASSWORD,
+    POSTGRES_DB_TEST,
+    POSTGRES_USER_TEST,
+    POSTGRES_PASSWORD_TEST,
+    ENV
 } = process.env
 
-const client = new Pool({
+const isTestMode = ENV === "test";
+
+const db = new Pool({
     host: POSTGRES_HOST,
-    database: POSTGRES_DB,
-    user: POSTGRES_USER,
-    password: POSTGRES_PASSWORD
+    database: isTestMode ? POSTGRES_DB_TEST : POSTGRES_DB,
+    user: isTestMode ? POSTGRES_USER_TEST : POSTGRES_USER,
+    password: isTestMode ? POSTGRES_PASSWORD_TEST : POSTGRES_PASSWORD
 })
 
-export default client
+export default db

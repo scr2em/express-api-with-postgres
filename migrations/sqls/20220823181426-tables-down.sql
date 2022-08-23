@@ -1,2 +1,1 @@
-DROP TABLE categories CASCADE;
-DROP TABLE products;
+DROP TABLE categories, products, users, orders;
