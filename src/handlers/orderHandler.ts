@@ -1,10 +1,9 @@
-import {Router} from 'express'
+import { Router } from "express";
 
 const orderRouter: Router = Router();
 
+orderRouter.get("/order", (req, res) => {
+	res.send("hi");
+});
 
-orderRouter.get("/order",(req,res)=>{
-    res.send("hi")
-})
-
-export default orderRouter
+export default orderRouter;

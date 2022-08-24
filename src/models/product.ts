@@ -75,7 +75,7 @@ export class ProductStore implements Store<ProductI> {
 		}
 	}
 
-	async getTopPopularProducts(limit: number = 0): Promise<ProductI[]> {
+	async getTopPopularProducts(limit = 0): Promise<ProductI[]> {
 		try {
 			const sql = `SELECT pr.id, pr.name, price, (available-consumed) as stock, ct.name as category_name
 						FROM products pr
