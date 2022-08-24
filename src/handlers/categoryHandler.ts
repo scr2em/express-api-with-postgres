@@ -1,18 +1,55 @@
-import {Router} from 'express'
-import {CategoryStore} from "../models/category";
-const categoryRouter: Router = Router();
+import { Router } from "express";
+import { CategoryStore } from "../models/category";
+import { getError } from "../utils/errorHandling";
+const router: Router = Router();
 
+const store = new CategoryStore();
 
-categoryRouter.post("/category",async (req,res)=>{
-    const {name } = req.body
+router.get("/category", async (req, res) => {
+	try {
+		const categories = await store.index();
+		res.send(categories);
+	} catch (e) {
+		res.status(400).send(getError(e));
+	}
+});
+router.get("/category/:id", async (req, res) => {
+	const id = req.params.id;
 
-    const store = new CategoryStore()
-    try {
-        const category = await store.create({name})
-        res.send(category)
-    }catch (e){
-        res.status(400).send("error")
-    }
-})
+	if (!id) {
+		return res.status(400).send("id param is missing");
+	}
+	try {
+		const category = await store.show(+id);
+		res.send(category);
+	} catch (e) {
+		res.status(400).send(getError(e));
+	}
+});
+router.post("/category", async (req, res) => {
+	const { name } = req.body;
 
-export default categoryRouter
+	try {
+		const category = await store.create({ name });
+		res.status(201).send(category);
+	} catch (e) {
+		res.status(400).send(getError(e));
+	}
+});
+
+router.delete("/category/:id", async (req, res) => {
+	const id = req.params.id;
+
+	if (!id) {
+		return res.status(400).send("id param is missing");
+	}
+
+	try {
+		const isDeleted = await store.delete(+id);
+		res.send();
+	} catch (e) {
+		res.status(400).send(getError(e));
+	}
+});
+
+export default router;

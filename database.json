@@ -1,16 +1,16 @@
 {
   "dev": {
     "driver": "pg",
-    "host": "127.0.0.1",
-    "database": "postgres",
-    "user": "postgres",
-    "password": "164725983590"
+    "host": {"ENV" :  "POSTGRES_HOST"},
+    "database": {"ENV" :  "POSTGRES_DB"},
+    "user": {"ENV" :  "POSTGRES_USER"},
+    "password": {"ENV" :  "POSTGRES_PASSWORD"}
   },
   "test": {
     "driver": "pg",
-    "host": "127.0.0.1",
-    "database": "test",
-    "user": "test",
-    "password": "test"
+    "host": {"ENV" :  "POSTGRES_HOST"},
+    "database": {"ENV" :  "POSTGRES_DB_TEST"},
+    "user": {"ENV" :  "POSTGRES_USER_TEST"},
+    "password": {"ENV" :  "POSTGRES_PASSWORD_TEST"}
   }
 }
