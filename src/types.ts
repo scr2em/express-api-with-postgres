@@ -16,3 +16,18 @@ export interface UserI {
 	email: string;
 	password: string;
 }
+
+export interface OrderI {
+	id: number;
+	user_id: number;
+	status: "active" | "completed" | "canceled";
+	order_price: number;
+	products: ProductI[];
+}
+
+export interface ProductI {
+	id: number;
+	name: string;
+	price: number;
+	available: number;
+}

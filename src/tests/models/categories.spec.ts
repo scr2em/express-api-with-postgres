@@ -1,4 +1,4 @@
-import { CategoryStore, CategoryI } from "../../models/category";
+import { CategoryStore } from "../../models/category";
 
 const store = new CategoryStore();
 
