@@ -29,5 +29,15 @@ export interface ProductI {
 	id: number;
 	name: string;
 	price: number;
+	stock: number;
+	category_name: string;
+}
+
+export interface DbProductI {
+	id: number;
+	name: string;
+	price: number;
 	available: number;
+	consumed: number;
+	category_id: number;
 }

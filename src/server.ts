@@ -8,6 +8,7 @@ import fs from "fs";
 import path from "path";
 import categoryRouter from "./handlers/categoryHandler";
 import userRouter from "./handlers/userHandler";
+import productRouter from "./handlers/productHandler";
 
 const app: Application = express();
 const port = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.use(morgan("combined"));
 app.use(categoryRouter);
 app.use(userRouter);
 app.use(orderRouter);
+app.use(productRouter);
 
 app.get("/", function (req: Request, res: Response) {
 	res.send("Hello World!");
