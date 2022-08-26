@@ -1,4 +1,5 @@
 import { UserStore } from "../../models/user";
+import objectContaining = jasmine.objectContaining;
 
 const store = new UserStore();
 
@@ -23,14 +24,15 @@ describe("User model test", () => {
 		const users = await store.index();
 		expect(users).toEqual([]);
 	});
-
+	let userId: number;
 	it("create method should add a new user", async () => {
-		const { token } = await store.create({
+		const { token, id } = await store.create({
 			firstName: "mohamed",
 			lastName: "abdelgawad",
 			email: "mohamed@mohamed.com",
 			password: "test",
 		});
+		userId = id;
 		expect(token).toBeInstanceOf(String);
 	});
 
@@ -38,7 +40,7 @@ describe("User model test", () => {
 		const users = await store.index();
 		expect(users).toEqual([
 			{
-				id: 1,
+				id: userId,
 				email: "mohamed@mohamed.com",
 				first_name: "mohamed",
 				last_name: "abdelgawad",
@@ -47,9 +49,9 @@ describe("User model test", () => {
 	});
 
 	it("show method should return a user by id", async () => {
-		const result = await store.show(1);
+		const result = await store.show(userId);
 		expect(result).toEqual({
-			id: 1,
+			id: userId,
 			email: "mohamed@mohamed.com",
 			first_name: "mohamed",
 			last_name: "abdelgawad",

@@ -1,5 +1,4 @@
 import db from "../db/db";
-import { DbUser, UserI } from "../types";
 import { createToken } from "../utils/token";
 import { encryptPassword, verifyPassword } from "../utils/password";
 
@@ -76,6 +75,20 @@ export class UserStore {
 			}
 		} catch (e) {
 			throw new Error(`Could not login user with email: ${email}.`);
+		} finally {
+			conn.release();
+		}
+	}
+	// used for testing
+	async delete(id: number): Promise<boolean> {
+		const conn = await db.connect();
+		try {
+			const sql = "DELETE FROM users WHERE id=($1)";
+
+			const result = await conn.query(sql, [id]);
+			return result.rowCount === 1;
+		} catch (err) {
+			throw new Error(`Could not delete user with ${id}.`);
 		} finally {
 			conn.release();
 		}

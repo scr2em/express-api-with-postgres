@@ -23,37 +23,35 @@ describe("Category model test", () => {
 		const categories = await store.index();
 		expect(categories).toEqual([]);
 	});
-
+	let categoryId: number;
 	it("create method should add a category", async () => {
 		const result = await store.create({
 			name: "testName",
 		});
-		expect(result).toEqual({
-			id: 1,
-			name: "testName",
-		});
+		categoryId = result.id;
+		expect(result.name).toEqual("testName");
 	});
 
 	it("index method should return a list of categories", async () => {
 		const result = await store.index();
 		expect(result).toEqual([
 			{
-				id: 1,
+				id: categoryId,
 				name: "testName",
 			},
 		]);
 	});
 
 	it("show method should return the correct category", async () => {
-		const result = await store.show(1);
+		const result = await store.show(categoryId);
 		expect(result).toEqual({
-			id: 1,
+			id: categoryId,
 			name: "testName",
 		});
 	});
 
 	it("delete method should remove the category by id", async () => {
-		await store.delete(1);
+		await store.delete(categoryId);
 		const result = await store.index();
 
 		expect(result).toEqual([]);

@@ -18,7 +18,9 @@ app.use(bodyParser.json());
 
 // const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), { flags: "a" });
 
-app.use(morgan("combined"));
+if (process.env.ENV === "dev") {
+	app.use(morgan("combined"));
+}
 
 app.use(categoryRouter);
 app.use(userRouter);
@@ -29,6 +31,11 @@ app.get("/", function (req: Request, res: Response) {
 	res.send("Hello World!");
 });
 
-app.listen(3000, function () {
+app.all("*", (_, res) => {
+	res.status(404).end("page not found");
+});
+app.listen(port, function () {
 	console.log(`Server is up and running at port: ${port} in mode: ${process.env.ENV}`);
 });
+
+export default app;

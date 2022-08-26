@@ -59,7 +59,7 @@ describe("Product model test", () => {
 			price: 100,
 			stock: 99,
 			category_name: "product-category",
-			user_id: 2,
+			user_id: user.id,
 		});
 	});
 	it("should delete a product", async () => {
