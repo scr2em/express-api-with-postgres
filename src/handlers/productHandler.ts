@@ -43,10 +43,10 @@ router.get("/product/:id", async (req, res) => {
 	}
 });
 router.post("/product", async (req, res) => {
-	const { name, price, available, category_id } = req.body;
+	const { name, price, available, categoryId } = req.body;
 
 	try {
-		const product = await store.create({ name, price, available, category_id });
+		const product = await store.create({ name, price, available, categoryId });
 		res.status(201).send(product);
 	} catch (e) {
 		res.status(400).send(getError(e));

@@ -35,9 +35,9 @@ export class UserStore implements Omit<Store<UserI>, "delete"> {
 			const { BCRYPT_SALT_ROUNDS = 5, BCRYPT_PEPPER = "" } = process.env;
 			const encryptedPassword = bcrypt.hashSync(password + BCRYPT_PEPPER, +BCRYPT_SALT_ROUNDS);
 			const result = await conn.query(sql, [email, firstName, lastName, encryptedPassword]);
-			const category = result.rows[0];
+			const user = result.rows[0];
 			conn.release();
-			return category;
+			return user;
 		} catch (err) {
 			throw new Error(`Could not add new user ${email}.`);
 		}

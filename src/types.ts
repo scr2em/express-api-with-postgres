@@ -19,10 +19,9 @@ export interface UserI {
 
 export interface OrderI {
 	id: number;
-	user_id: number;
+	userId: number;
 	status: "active" | "completed" | "canceled";
-	order_price: number;
-	products: ProductI[];
+	products: { id: number; quantity: number }[];
 }
 
 export interface ProductI {
@@ -30,7 +29,7 @@ export interface ProductI {
 	name: string;
 	price: number;
 	stock: number;
-	category_name: string;
+	categoryName: string;
 }
 
 export interface DbProductI {
@@ -39,5 +38,5 @@ export interface DbProductI {
 	price: number;
 	available: number;
 	consumed: number;
-	category_id: number;
+	categoryId: number;
 }
