@@ -37,7 +37,6 @@
 | DELETE | /product/:id     | YES    |                                                                               |                        | To delete a specific product by id                                                           |
 | GET    | /popularProducts | NO     |                                                                               | `limit`  default 2     | To get top popular products based on how many times the product is sold                      |
 
-
 ## 4- Orders
 
 ### API Endpoints
@@ -47,3 +46,5 @@
 | GET    | /order/:id     | YES   |                                                     | To get a specific order by id                              |
 | POST   | /order         | YES   | {products : { id: `number`, `quantity`: number }[]} | To create a new order                                      |
 | DELETE | /order/:id     | YES   |                                                     | To delete a specific order by id if it belongs to the user |
+
+* when an order is deleted, the products' quantity gets subtracted from `consumed` property of the product.
