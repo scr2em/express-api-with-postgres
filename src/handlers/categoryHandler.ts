@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { CategoryStore } from "../models/category";
 import { getError } from "../utils/errorHandling";
+import { authorizeUser } from "../middlewares/authenticate";
 const router: Router = Router();
 
 const store = new CategoryStore();
@@ -26,7 +27,7 @@ router.get("/category/:id", async (req, res) => {
 		res.status(400).send(getError(e));
 	}
 });
-router.post("/category", async (req, res) => {
+router.post("/category", authorizeUser, async (req, res) => {
 	const { name } = req.body;
 
 	try {
@@ -37,7 +38,7 @@ router.post("/category", async (req, res) => {
 	}
 });
 
-router.delete("/category/:id", async (req, res) => {
+router.delete("/category/:id", authorizeUser, async (req, res) => {
 	const id = req.params.id;
 
 	if (!id) {

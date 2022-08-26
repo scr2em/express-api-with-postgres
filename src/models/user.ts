@@ -1,17 +1,20 @@
 import db from "../db/db";
 import { Store, UserI } from "../types";
-import bcrypt from "bcrypt";
+import { createToken } from "../utils/token";
+import { encryptPassword, verifyPassword } from "../utils/password";
 
 export class UserStore implements Omit<Store<UserI>, "delete"> {
 	async index(): Promise<UserI[]> {
+		const conn = await db.connect();
 		try {
-			const conn = await db.connect();
 			const sql = "SELECT id, email, first_name, last_name FROM users";
 			const result = await conn.query(sql);
-			conn.release();
+
 			return Promise.resolve(result.rows);
 		} catch (e) {
 			throw new Error(`cannot get users.`);
+		} finally {
+			conn.release();
 		}
 	}
 	async show(id: number): Promise<UserI> {
@@ -26,22 +29,49 @@ export class UserStore implements Omit<Store<UserI>, "delete"> {
 		}
 	}
 
-	async create({ email, firstName, lastName, password }: Partial<UserI>): Promise<UserI> {
+	async create({
+		email,
+		firstName,
+		lastName,
+		password,
+	}: Pick<UserI, "email" | "firstName" | "lastName" | "password">): Promise<{ token: string }> {
+		const conn = await db.connect();
 		try {
 			const sql =
 				"INSERT INTO users (email,first_name,last_name,password) VALUES($1, $2, $3, $4) RETURNING id, email, first_name, last_name";
-			const conn = await db.connect();
 
-			const { BCRYPT_SALT_ROUNDS = 5, BCRYPT_PEPPER = "" } = process.env;
-			const encryptedPassword = bcrypt.hashSync(password + BCRYPT_PEPPER, +BCRYPT_SALT_ROUNDS);
+			const encryptedPassword = encryptPassword(password);
 			const result = await conn.query(sql, [email, firstName, lastName, encryptedPassword]);
 			const user = result.rows[0];
-			conn.release();
-			return user;
+
+			return {
+				token: createToken({ id: user.id, email }, { expiresIn: 400 }),
+			};
 		} catch (err) {
 			throw new Error(`Could not add new user ${email}.`);
+		} finally {
+			conn.release();
 		}
 	}
 
-	// async authenticate();
+	async authenticate({ email, password }: Pick<UserI, "email" | "password">): Promise<string | undefined> {
+		const conn = await db.connect();
+
+		try {
+			const result = await db.query("SELECT id, email, password FROM users where email = $1", [email]);
+			const id = result.rows[0].id;
+			const password_hashed = result.rows[0].password;
+			const dbEmail = result.rows[0].email;
+			const isPasswordCorrect = verifyPassword(password, password_hashed);
+			if (isPasswordCorrect) {
+				return createToken({ id, email: dbEmail });
+			} else {
+				return;
+			}
+		} catch (e) {
+			throw new Error(`Could not login user with email: ${email}.`);
+		} finally {
+			conn.release();
+		}
+	}
 }

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getError } from "../utils/errorHandling";
 import { ProductStore } from "../models/product";
+import { authorizeUser } from "../middlewares/authenticate";
 const router: Router = Router();
 
 const store = new ProductStore();
@@ -42,11 +43,11 @@ router.get("/product/:id", async (req, res) => {
 		res.status(400).send(getError(e));
 	}
 });
-router.post("/product", async (req, res) => {
+router.post("/product", authorizeUser, async (req, res) => {
 	const { name, price, available, categoryId } = req.body;
-
+	const { id: userId } = res.locals.decodedToken;
 	try {
-		const product = await store.create({ name, price, available, categoryId });
+		const product = await store.create({ name, price, available, categoryId, userId });
 		res.status(201).send(product);
 	} catch (e) {
 		res.status(400).send(getError(e));
@@ -60,7 +61,7 @@ router.delete("/product/:id", async (req, res) => {
 		return res.status(400).send("id param is missing");
 	}
 	try {
-		const isDeleted = await store.delete(+id);
+		await store.delete(+id);
 		res.send();
 	} catch (e) {
 		res.status(400).send(getError(e));

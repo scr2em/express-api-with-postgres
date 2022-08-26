@@ -30,14 +30,14 @@ export class ProductStore implements Store<ProductI> {
 		}
 	}
 
-	async create({ name, price, available, categoryId }: Partial<DbProductI>): Promise<ProductI> {
+	async create({ name, price, available, categoryId, userId }: Partial<DbProductI>): Promise<ProductI> {
 		try {
-			const sql = `INSERT INTO products (name,price,available,category_id)
- 						 VALUES($1, $2, $3, $4) 
+			const sql = `INSERT INTO products (name,price,available,category_id, user_id)
+ 						 VALUES($1, $2, $3, $4, $5) 
  						 RETURNING *`;
 
 			const conn = await db.connect();
-			const result = await conn.query(sql, [name, price, available, categoryId]);
+			const result = await conn.query(sql, [name, price, available, categoryId, userId]);
 			const category = result.rows[0];
 			conn.release();
 			return category;

@@ -1,8 +1,8 @@
 export abstract class Store<T> {
-	abstract index(): Promise<T[]>;
-	abstract show(id: number): Promise<T>;
-	abstract create(data: Partial<T>): Promise<T>;
-	abstract delete(id: number): Promise<boolean>;
+	abstract index(userId?: number): Promise<T[]>;
+	abstract show(id: number, userId?: number): Promise<T>;
+	abstract create(data: Partial<T>): Promise<any>;
+	abstract delete(id: number, userId?: number): Promise<boolean>;
 }
 export interface CategoryI {
 	id: number;
@@ -39,4 +39,5 @@ export interface DbProductI {
 	available: number;
 	consumed: number;
 	categoryId: number;
+	userId: number;
 }

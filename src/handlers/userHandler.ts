@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { getError } from "../utils/errorHandling";
 import { UserStore } from "../models/user";
+import { authorizeUser } from "../middlewares/authenticate";
 const router: Router = Router();
 
 const store = new UserStore();
 
-router.get("/user", async (req, res) => {
+router.get("/user", authorizeUser, async (req, res) => {
 	try {
 		const users = await store.index();
 		res.send(users);
@@ -14,7 +15,7 @@ router.get("/user", async (req, res) => {
 	}
 });
 
-router.get("/user/:id", async (req, res) => {
+router.get("/user/:id", authorizeUser, async (req, res) => {
 	const id = req.params.id;
 
 	if (!id) {
@@ -39,4 +40,18 @@ router.post("/user", async (req, res) => {
 	}
 });
 
+router.post("/login", async (req, res) => {
+	const { email, password } = req.body;
+
+	try {
+		const token = await store.authenticate({ email, password });
+		if (token) {
+			res.status(201).send(token);
+		} else {
+			res.status(400).end();
+		}
+	} catch (e) {
+		res.status(400).send(getError(e));
+	}
+});
 export default router;

@@ -1,9 +1,9 @@
 import db from "../db/db";
-import { OrderI, ProductI, Store } from "../types";
+import { OrderI, Store } from "../types";
 import _sumBy from "lodash/sumBy";
 
 export class OrderStore implements Store<OrderI> {
-	async index(): Promise<OrderI[]> {
+	async index(userId: number): Promise<OrderI[]> {
 		const conn = await db.connect();
 
 		try {
@@ -19,9 +19,9 @@ export class OrderStore implements Store<OrderI> {
 						  INNER JOIN products p ON op.product_id = p.id 
 						  INNER JOIN categories c on p.category_id = c.id 
 						  INNER JOIN orders o on o.id = op.order_id 
-						  GROUP BY order_id, status;
-							 `;
-			const result = await conn.query(sql);
+						  GROUP BY order_id, status
+						  WHERE o.user_id = $1 `;
+			const result = await conn.query(sql, [userId]);
 
 			return result.rows;
 		} catch (e) {
@@ -33,7 +33,7 @@ export class OrderStore implements Store<OrderI> {
 	async show(id: number): Promise<OrderI> {
 		const conn = await db.connect();
 		try {
-			const sql = ` SELECT 
+			const sql = `SELECT 
 							 order_id,
 							 status,
 							 json_agg(json_build_object('id', p.id, 
@@ -46,9 +46,7 @@ export class OrderStore implements Store<OrderI> {
 						  INNER JOIN categories c on p.category_id = c.id 
 						  INNER JOIN orders o on o.id = op.order_id 
 						  WHERE o.id = $1
-						  GROUP BY order_id, status
-						  ;
-							 `;
+						  GROUP BY order_id, status`;
 
 			const result = await conn.query(sql, [id]);
 
@@ -92,7 +90,6 @@ export class OrderStore implements Store<OrderI> {
 			await db.query("COMMIT");
 			return this.show(orderId);
 		} catch (err) {
-			console.log(err);
 			await db.query("ROLLBACK");
 			throw new Error(`Could not create new order.`);
 		} finally {
@@ -124,5 +121,17 @@ export class OrderStore implements Store<OrderI> {
 		}
 	}
 
-	// async authenticate();
+	async isAllowedToDeleteOrder(userId: number, orderId: number): Promise<boolean> {
+		const conn = await db.connect();
+		try {
+			const result = await db.query("SELECT user_id FROM orders WHERE id=$1", [orderId]);
+			const order_user_id = result.rows[0]?.user_id;
+
+			return order_user_id === userId;
+		} catch (e) {
+			throw new Error("this user doesn't have permission to delete this order");
+		} finally {
+			conn.release();
+		}
+	}
 }
