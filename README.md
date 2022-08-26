@@ -1,54 +1,71 @@
-# Storefront Backend Project
+# GETTING STARTED
 
-## Getting Started
+1- Rename `.env.local` to `.env` and set these variables accordingly.
 
-This repo contains a basic Node and Express app to get you started in constructing an API. To get started, clone this repo and run `yarn` in your terminal at the project root.
+2- use `npm run start` or `npm run watch` to run the server in watch mode
 
-## Required Technologies
-Your application must make use of the following libraries:
-- Postgres for the database
-- Node/Express for the application logic
-- dotenv from npm for managing environment variables
-- db-migrate from npm for migrations
-- jsonwebtoken from npm for working with JWTs
-- jasmine from npm for testing
+3- use `npm run build` to build the app to `dist` folder
 
-## Steps to Completion
+4- use `npm run tesst` to run the tests files.
 
-### 1. Plan to Meet Requirements
+5- use `npm run fmt` to apply eslint rules and format all files.
 
-In this repo there is a `REQUIREMENTS.md` document which outlines what this API needs to supply for the frontend, as well as the agreed upon data shapes to be passed between front and backend. This is much like a document you might come across in real life when building or extending an API. 
 
-Your first task is to read the requirements and update the document with the following:
-- Determine the RESTful route for each endpoint listed. Add the RESTful route and HTTP verb to the document so that the frontend developer can begin to build their fetch requests.    
-**Example**: A SHOW route: 'blogs/:id' [GET] 
+# DATABASE TABLES
 
-- Design the Postgres database tables based off the data shape requirements. Add to the requirements document the database tables and columns being sure to mark foreign keys.   
-**Example**: You can format this however you like but these types of information should be provided
-Table: Books (id:varchar, title:varchar, author:varchar, published_year:varchar, publisher_id:string[foreign key to publishers table], pages:number)
+### 1- users
+| COLUMN     | TYPE           | CONSTRAINTS        | DESCRIPTION         |
+|------------|----------------|--------------------|---------------------|
+| id         | integer        | SERIAL PRIMARY KEY |                     |
+| first_name | CHAR VAR(50)   | NOT NULL           |                     |
+| last_name  | CHAR VAR(50)   | NOT NULL           |                     |
+| password   | CHAR VAR(255)  | NOT NULL           | the hashed password |
+| email      | CHAR VAR(100)  | UNIQUE             |                     |
 
-**NOTE** It is important to remember that there might not be a one to one ratio between data shapes and database tables. Data shapes only outline the structure of objects being passed between frontend and API, the database may need multiple tables to store a single shape. 
 
-### 2.  DB Creation and Migrations
 
-Now that you have the structure of the databse outlined, it is time to create the database and migrations. Add the npm packages dotenv and db-migrate that we used in the course and setup your Postgres database. If you get stuck, you can always revisit the database lesson for a reminder. 
+### 2- categories 
+| COLUMN      | TYPE     | CONSTRAINTS        | DESCRIPTION |
+|-------------|----------|--------------------|-------------|
+| id          | integer  | SERIAL PRIMARY KEY |             |
+| name        | CHAR VAR | NOT NULL  UNIQUE   |             |
 
-You must also ensure that any sensitive information is hashed with bcrypt. If any passwords are found in plain text in your application it will not pass.
+### 3- products
 
-### 3. Models
+| COLUMN      | TYPE      | CONSTRAINTS        | DESCRIPTION                                  |
+|-------------|-----------|--------------------|----------------------------------------------|
+| id          | integer   | SERIAL PRIMARY KEY |                                              |
+| name        | CHAR VAR  | NOT NULL           |                                              |
+| price       | integer   | NOT NULL  >=0      |                                              |
+| category_id | integer   | NOT NULL           | refers to the category of this product       |
+| available   | integer   | default 0 >=0      | how many items are available of this product |
+| consumed    | integer   | default 0 >=0      | how many products have been sold             |
+| user_id     | integer   | NOT NULL           | refers to the user who created this product  |
 
-Create the models for each database table. The methods in each model should map to the endpoints in `REQUIREMENTS.md`. Remember that these models should all have test suites and mocks.
+* there is a constraint to check that (available-consumed) >= 0
 
-### 4. Express Handlers
+### 4- orders
 
-Set up the Express handlers to route incoming requests to the correct model method. Make sure that the endpoints you create match up with the enpoints listed in `REQUIREMENTS.md`. Endpoints must have tests and be CORS enabled. 
+| COLUMN      | TYPE     | CONSTRAINTS                          | DESCRIPTION                                             |
+|-------------|----------|--------------------------------------|---------------------------------------------------------|
+| id          | integer  | SERIAL PRIMARY KEY                   |                                                         |
+| user_id     | CHAR VAR | NOT NULL                             | refers to the user who created this order               |
+| status      | integer  | "active" or "complete" or "canceled" |                                                         |
+| order_price | integer  | NOT NULL                             | the total price of this order at the moment of creation |
 
-### 5. JWTs
+* when a user is deleted, the associated orders are deleted as well 
+* 
+### 5- order_products 
 
-Add JWT functionality as shown in the course. Make sure that JWTs are required for the routes listed in `REQUIUREMENTS.md`.
+because the relation between order and products are many to many
+(any product can be in different orders and any order can have many products)
+we have to make a separate table for this relation
 
-### 6. QA and `README.md`
+| COLUMN        | TYPE    | CONSTRAINTS        | DESCRIPTION                                                 |
+|---------------|---------|--------------------|-------------------------------------------------------------|
+| order_id      | integer | SERIAL PRIMARY KEY | refers to the order                                         |
+| product_id    | integer | NOT NULL           | refers to the product in this order                         |
+| quantity      | integer | NOT NULL  >=0      | the quantity of this product in this order                  |
+| product_price | integer | NOT NULL           | the price of the product the moment the user made the order |
 
-Before submitting, make sure that your project is complete with a `README.md`. Your `README.md` must include instructions for setting up and running your project including how you setup, run, and connect to your database. 
-
-Before submitting your project, spin it up and test each endpoint. If each one responds with data that matches the data shapes from the `REQUIREMENTS.md`, it is ready for submission!
+* when an order or product is deleted, the associated rows in the order_products table are deleted automatically
