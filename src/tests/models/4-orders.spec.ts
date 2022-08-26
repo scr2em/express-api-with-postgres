@@ -61,11 +61,13 @@ describe("Order model test", () => {
 		expect(orders).toEqual([]);
 	});
 
+	let orderId: number;
 	it("create method should add a new order", async () => {
 		const order = await orderStore.create({ userId: user.id, products: [{ id: productA.id, quantity: 5 }] });
 
+		orderId = order.order_id;
 		expect(order).toEqual({
-			order_id: 1,
+			order_id: order.order_id,
 			status: "active",
 			products: [
 				{
@@ -84,12 +86,19 @@ describe("Order model test", () => {
 		expect(product.stock).toEqual(5);
 	});
 	it("delete method should delete an order with specific id", async () => {
-		const isDeleted = await orderStore.delete(1);
+		const isDeleted = await orderStore.delete(orderId);
 
 		expect(isDeleted).toEqual(true);
 
 		const orders = await orderStore.index(user.id);
 
 		expect(orders).toEqual([]);
+	});
+
+	afterAll(async () => {
+		await productStore.delete(productA.id);
+		await productStore.delete(productB.id);
+		await categoryStore.delete(category.id);
+		await userStore.delete(user.id);
 	});
 });

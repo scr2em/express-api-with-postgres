@@ -1,6 +1,7 @@
 import { ProductStore } from "../../models/product";
 import { UserStore } from "../../models/user";
 import { CategoryStore } from "../../models/category";
+import { after } from "lodash";
 
 const productStore = new ProductStore();
 const userStore = new UserStore();
@@ -44,7 +45,7 @@ describe("Product model test", () => {
 		const users = await productStore.index();
 		expect(users).toEqual([]);
 	});
-
+	let productId: number;
 	it("create method should add a new product", async () => {
 		const product = await productStore.create({
 			name: "product name here",
@@ -53,8 +54,9 @@ describe("Product model test", () => {
 			available: 99,
 			categoryId: category.id,
 		});
+		productId = product.id;
 		expect(product).toEqual({
-			id: 1,
+			id: productId,
 			name: "product name here",
 			price: 100,
 			stock: 99,
@@ -63,9 +65,14 @@ describe("Product model test", () => {
 		});
 	});
 	it("should delete a product", async () => {
-		await productStore.delete(1);
+		await productStore.delete(productId);
 
 		const products = await productStore.index();
 		expect(products).toEqual([]);
+	});
+
+	afterAll(async () => {
+		await userStore.delete(user.id);
+		await categoryStore.delete(category.id);
 	});
 });

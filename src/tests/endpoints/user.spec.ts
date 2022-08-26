@@ -17,29 +17,28 @@ describe("ENDPOINT /user suite test", () => {
 		expect(response.body.id).toBeTruthy();
 	});
 
-	describe("test protected routes", () => {
-		it("GET -  a user by id", async () => {
-			const response = await request(app)
-				.get("/user/" + userId)
-				.set("Authorization", "Bearer " + token);
+	it("GET -  a user by id", async () => {
+		const response = await request(app)
+			.get("/user/" + userId)
+			.set("Authorization", "Bearer " + token);
 
-			expect(response.status).toEqual(200);
-			expect(response.body).toEqual({
-				email: mockedUser.email,
-				id: userId,
-				first_name: mockedUser.firstName,
-				last_name: mockedUser.lastName,
-			});
-		});
-		it("GET - all users", async () => {
-			const response = await request(app)
-				.get("/user")
-				.set("Authorization", "Bearer " + token);
-
-			expect(response.status).toEqual(200);
-			expect(response.body).toBeInstanceOf(Array);
+		expect(response.status).toEqual(200);
+		expect(response.body).toEqual({
+			email: mockedUser.email,
+			id: userId,
+			first_name: mockedUser.firstName,
+			last_name: mockedUser.lastName,
 		});
 	});
+	it("GET - all users", async () => {
+		const response = await request(app)
+			.get("/user")
+			.set("Authorization", "Bearer " + token);
+
+		expect(response.status).toEqual(200);
+		expect(response.body).toBeInstanceOf(Array);
+	});
+
 	// clean up
 	afterAll(async () => {
 		const store = new UserStore();

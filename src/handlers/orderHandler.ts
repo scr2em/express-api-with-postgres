@@ -30,7 +30,7 @@ orderRouter.post("/order", authorizeUser, async (req: Request, res: Response) =>
 	const userId = res.locals.decodedToken.id;
 	try {
 		const order = await store.create({ userId, products });
-		res.send(order);
+		res.status(201).send(order);
 	} catch (e) {
 		res.status(400).send(getError(e));
 	}

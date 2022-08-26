@@ -32,7 +32,6 @@ export class OrderStore {
 
 			return result.rows;
 		} catch (e) {
-			console.log(e);
 			throw new Error(`cannot get users.`);
 		} finally {
 			conn.release();
@@ -129,7 +128,6 @@ export class OrderStore {
 			await db.query("COMMIT");
 			return result.rowCount === 1;
 		} catch (e) {
-			console.log(e);
 			await db.query("ROLLBACK");
 			throw new Error("Ops sorry couldn't delete this order");
 		} finally {
