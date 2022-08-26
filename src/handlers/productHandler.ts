@@ -54,15 +54,20 @@ router.post("/product", authorizeUser, async (req, res) => {
 	}
 });
 
-router.delete("/product/:id", async (req, res) => {
+router.delete("/product/:id", authorizeUser, async (req, res) => {
 	const id = req.params.id;
-
+	const userId = res.locals.decodedToken.id;
 	if (!id) {
 		return res.status(400).send("id param is missing");
 	}
 	try {
-		await store.delete(+id);
-		res.send();
+		const isAllowedToDelete = await store.isAllowedToDeleteProduct(+id, userId);
+		if (isAllowedToDelete) {
+			await store.delete(+id);
+			res.send("done");
+		} else {
+			res.status(401).end();
+		}
 	} catch (e) {
 		res.status(400).send(getError(e));
 	}

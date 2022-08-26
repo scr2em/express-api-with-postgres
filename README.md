@@ -1,14 +1,20 @@
 # GETTING STARTED
 
-1- Rename `.env.local` to `.env` and set these variables accordingly.
+1- clone this repo
 
-2- use `npm run start` or `npm run watch` to run the server in watch mode
+2- run `npm install` to install all dependencies.
 
-3- use `npm run build` to build the app to `dist` folder
+3- Rename `.env.local` to `.env` and set these variables accordingly.
 
-4- use `npm run tesst` to run the tests files.
+4- use `npm run start` or `npm run watch` to run the server in watch mode
 
-5- use `npm run fmt` to apply eslint rules and format all files.
+5- use `npm run build` to build the app to `dist` folder
+
+6- use `npm run tesst` to run the tests files.
+
+7- use `npm run fmt` to apply eslint rules and format all files.
+
+8- there are 2 databases `dev` for development and `test` for testing  (default ports).
 
 
 # DATABASE TABLES
@@ -24,11 +30,11 @@
 
 
 
-### 2- categories 
+### 2- categories
 | COLUMN      | TYPE     | CONSTRAINTS        | DESCRIPTION |
 |-------------|----------|--------------------|-------------|
 | id          | integer  | SERIAL PRIMARY KEY |             |
-| name        | CHAR VAR | NOT NULL  UNIQUE   |             |
+| name        | CHAR VAR | NOT NULL UNIQUE    |             |
 
 ### 3- products
 
@@ -53,9 +59,9 @@
 | status      | integer  | "active" or "complete" or "canceled" |                                                         |
 | order_price | integer  | NOT NULL                             | the total price of this order at the moment of creation |
 
-* when a user is deleted, the associated orders are deleted as well 
-* 
-### 5- order_products 
+* when a user is deleted, the associated orders are deleted as well
+*
+### 5- order_products
 
 because the relation between order and products are many to many
 (any product can be in different orders and any order can have many products)

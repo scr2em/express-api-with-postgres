@@ -59,7 +59,20 @@ export class ProductStore implements Store<ProductI> {
 			throw new Error(`Could not delete products ${id}.`);
 		}
 	}
+	async isAllowedToDeleteProduct(productId: number, userId: number): Promise<boolean> {
+		const conn = await db.connect();
+		try {
+			const result = await db.query("SELECT user_id FROM products WHERE id=$1", [productId]);
+			const product_user_id = result.rows[0]?.user_id;
 
+			return product_user_id === userId;
+		} catch (e) {
+			throw new Error("this user doesn't have permission to delete this product");
+		} finally {
+			conn.release();
+		}
+		return true;
+	}
 	async getProductsByCategory(categoryId: number): Promise<ProductI[]> {
 		try {
 			const sql = `SELECT pr.id, pr.name, price, (available-consumed) as stock, ct.name as category_name 
