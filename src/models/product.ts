@@ -1,11 +1,12 @@
 import db from "../db/db";
-import { Store, ProductI, DbProductI } from "../types";
 
-export class ProductStore implements Store<ProductI> {
-	async index(): Promise<ProductI[]> {
+export class ProductStore {
+	async index(): Promise<
+		{ id: number; name: string; price: number; stock: number; category_name: string; user_id: number }[]
+	> {
 		try {
 			const conn = await db.connect();
-			const sql = `SELECT pr.id, pr.name, price, (available-consumed) as stock, ct.name as category_name 
+			const sql = `SELECT pr.id, pr.name, price, (available-consumed) as stock, ct.name as category_name , user_id
 						 FROM products pr 
 						 INNER JOIN categories ct on pr.category_id = ct.id`;
 			const result = await conn.query(sql);
@@ -15,35 +16,58 @@ export class ProductStore implements Store<ProductI> {
 			throw new Error(`cannot get products.`);
 		}
 	}
-	async show(id: number): Promise<ProductI> {
+	async show(
+		id: number,
+	): Promise<{ id: number; name: string; price: number; stock: number; category_name: string; user_id: number }> {
 		try {
-			const sql = `SELECT pr.id, pr.name, price, (available-consumed) as stock, ct.name as category_name 
+			const sql = `SELECT pr.id, pr.name, price, (available-consumed) as stock, ct.name as category_name , user_id
 						 FROM products pr 
 						 INNER JOIN categories ct on pr.category_id = ct.id
-						 WHERE id=($1)`;
+						 WHERE pr.id=($1)`;
 			const conn = await db.connect();
 			const result = await conn.query(sql, [id]);
 			conn.release();
+
 			return result.rows[0];
 		} catch (err) {
-			throw new Error(`Could not find products with id ${id}.`);
+			throw new Error(`Could not find a product with id ${id}.`);
 		}
 	}
 
-	async create({ name, price, available, categoryId, userId }: Partial<DbProductI>): Promise<ProductI> {
+	async create({
+		name,
+		price,
+		available,
+		categoryId,
+		userId,
+	}: {
+		name: string;
+		price: number;
+		available: number;
+		categoryId: number;
+		userId: number;
+	}): Promise<{
+		id: number;
+		name: string;
+		price: number;
+		stock: number;
+		category_name: string;
+		user_id: number;
+	}> {
+		const conn = await db.connect();
 		try {
 			const sql = `INSERT INTO products (name,price,available,category_id, user_id)
- 						 VALUES($1, $2, $3, $4, $5) 
- 						 RETURNING *`;
+ 						 VALUES($1, $2, $3, $4, $5) RETURNING id`;
 
-			const conn = await db.connect();
 			const result = await conn.query(sql, [name, price, available, categoryId, userId]);
-			const category = result.rows[0];
-			conn.release();
-			return category;
+			const product_id = result.rows[0].id;
+
+			return this.show(product_id);
 		} catch (err) {
 			console.log(err);
 			throw new Error(`Could not add new product ${name}.`);
+		} finally {
+			conn.release();
 		}
 	}
 
@@ -73,9 +97,11 @@ export class ProductStore implements Store<ProductI> {
 		}
 		return true;
 	}
-	async getProductsByCategory(categoryId: number): Promise<ProductI[]> {
+	async getProductsByCategory(
+		categoryId: number,
+	): Promise<{ id: number; name: string; price: number; stock: number; category_name: string; user_id: number }[]> {
 		try {
-			const sql = `SELECT pr.id, pr.name, price, (available-consumed) as stock, ct.name as category_name 
+			const sql = `SELECT pr.id, pr.name, price, (available-consumed) as stock, ct.name as category_name , user_id
 						 FROM products pr 
 						 INNER JOIN categories ct on pr.category_id = ct.id
 						 WHERE pr.category_id=($1)`;
@@ -88,9 +114,11 @@ export class ProductStore implements Store<ProductI> {
 		}
 	}
 
-	async getTopPopularProducts(limit = 0): Promise<ProductI[]> {
+	async getTopPopularProducts(
+		limit = 0,
+	): Promise<{ id: number; name: string; price: number; stock: number; category_name: string; user_id: number }[]> {
 		try {
-			const sql = `SELECT pr.id, pr.name, price, (available-consumed) as stock, ct.name as category_name
+			const sql = `SELECT pr.id, pr.name, price, (available-consumed) as stock, ct.name as category_name , user_id
 						FROM products pr
 						INNER JOIN categories ct on pr.category_id = ct.id
 						ORDER BY pr.consumed DESC

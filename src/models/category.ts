@@ -1,7 +1,7 @@
 import db from "../db/db";
-import { CategoryI, Store } from "../types";
+import { CategoryI } from "../types";
 
-export class CategoryStore implements Store<CategoryI> {
+export class CategoryStore {
 	async index(): Promise<CategoryI[]> {
 		try {
 			const conn = await db.connect();
@@ -25,7 +25,7 @@ export class CategoryStore implements Store<CategoryI> {
 		}
 	}
 
-	async create({ name }: Partial<CategoryI>): Promise<CategoryI> {
+	async create({ name }: { name: string }): Promise<CategoryI> {
 		try {
 			const sql = "INSERT INTO categories (name) VALUES($1) RETURNING *";
 			const conn = await db.connect();

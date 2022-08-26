@@ -1,10 +1,10 @@
 import db from "../db/db";
-import { Store, UserI } from "../types";
+import { DbUser, UserI } from "../types";
 import { createToken } from "../utils/token";
 import { encryptPassword, verifyPassword } from "../utils/password";
 
-export class UserStore implements Omit<Store<UserI>, "delete"> {
-	async index(): Promise<UserI[]> {
+export class UserStore {
+	async index(): Promise<{ id: number; email: string; first_name: string; last_name: string }[]> {
 		const conn = await db.connect();
 		try {
 			const sql = "SELECT id, email, first_name, last_name FROM users";
@@ -17,7 +17,7 @@ export class UserStore implements Omit<Store<UserI>, "delete"> {
 			conn.release();
 		}
 	}
-	async show(id: number): Promise<UserI> {
+	async show(id: number): Promise<{ id: number; email: string; first_name: string; last_name: string }> {
 		try {
 			const sql = "SELECT id, email, first_name, last_name FROM users WHERE id=($1)";
 			const conn = await db.connect();
@@ -34,7 +34,12 @@ export class UserStore implements Omit<Store<UserI>, "delete"> {
 		firstName,
 		lastName,
 		password,
-	}: Pick<UserI, "email" | "firstName" | "lastName" | "password">): Promise<{ token: string }> {
+	}: {
+		email: string;
+		firstName: string;
+		lastName: string;
+		password: string;
+	}): Promise<{ id: number; token: string }> {
 		const conn = await db.connect();
 		try {
 			const sql =
@@ -45,6 +50,7 @@ export class UserStore implements Omit<Store<UserI>, "delete"> {
 			const user = result.rows[0];
 
 			return {
+				id: user.id,
 				token: createToken({ id: user.id, email }, { expiresIn: 400 }),
 			};
 		} catch (err) {
@@ -54,7 +60,7 @@ export class UserStore implements Omit<Store<UserI>, "delete"> {
 		}
 	}
 
-	async authenticate({ email, password }: Pick<UserI, "email" | "password">): Promise<string | undefined> {
+	async authenticate({ email, password }: { email: string; password: string }): Promise<string | undefined> {
 		const conn = await db.connect();
 
 		try {

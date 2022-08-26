@@ -1,9 +1,3 @@
-export abstract class Store<T> {
-	abstract index(userId?: number): Promise<T[]>;
-	abstract show(id: number, userId?: number): Promise<T>;
-	abstract create(data: Partial<T>): Promise<any>;
-	abstract delete(id: number, userId?: number): Promise<boolean>;
-}
 export interface CategoryI {
 	id: number;
 	name: string;
@@ -16,7 +10,12 @@ export interface UserI {
 	email: string;
 	password: string;
 }
-
+export interface DbUser {
+	id: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+}
 export interface OrderI {
 	id: number;
 	userId: number;
@@ -30,6 +29,7 @@ export interface ProductI {
 	price: number;
 	stock: number;
 	categoryName: string;
+	userId: number;
 }
 
 export interface DbProductI {

@@ -21,8 +21,7 @@ CREATE TYPE order_status AS ENUM ('active', 'complete', 'canceled');
 
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
-    product_id INT NOT NULL REFERENCES products (id) ON DELETE CASCADE,
-    quantity INT NOT NULL,
     user_id INT NOT NULL  REFERENCES users (id) ON DELETE CASCADE,
-    status order_status
+    status order_status,
+    order_price INT NOT NULL
 );

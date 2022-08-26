@@ -1,9 +1,15 @@
 import db from "../db/db";
-import { OrderI, Store } from "../types";
+import { OrderI } from "../types";
 import _sumBy from "lodash/sumBy";
 
-export class OrderStore implements Store<OrderI> {
-	async index(userId: number): Promise<OrderI[]> {
+export class OrderStore {
+	async index(userId: number): Promise<
+		{
+			order_id: number;
+			status: "active" | "completed" | "canceled";
+			products: { id: number; name: string; quantity: number; categoryName: string; price: number }[];
+		}[]
+	> {
 		const conn = await db.connect();
 
 		try {
@@ -15,22 +21,28 @@ export class OrderStore implements Store<OrderI> {
 							 							'quantity', op.quantity,
 							 							'categoryName', c.name,
 							 							'price', op.product_price)) AS products 
-						  FROM order_products op 
+						  FROM order_products op  
 						  INNER JOIN products p ON op.product_id = p.id 
 						  INNER JOIN categories c on p.category_id = c.id 
 						  INNER JOIN orders o on o.id = op.order_id 
+						  WHERE o.user_id = ($1)
 						  GROUP BY order_id, status
-						  WHERE o.user_id = $1 `;
+						 `;
 			const result = await conn.query(sql, [userId]);
 
 			return result.rows;
 		} catch (e) {
+			console.log(e);
 			throw new Error(`cannot get users.`);
 		} finally {
 			conn.release();
 		}
 	}
-	async show(id: number): Promise<OrderI> {
+	async show(id: number): Promise<{
+		order_id: number;
+		status: "active" | "completed" | "canceled";
+		products: { id: number; name: string; quantity: number; categoryName: string; price: number }[];
+	}> {
 		const conn = await db.connect();
 		try {
 			const sql = `SELECT 
@@ -58,7 +70,11 @@ export class OrderStore implements Store<OrderI> {
 		}
 	}
 
-	async create({ userId, products }: Pick<OrderI, "userId" | "products">): Promise<OrderI> {
+	async create({ userId, products }: { userId: number; products: { id: number; quantity: number }[] }): Promise<{
+		order_id: number;
+		status: "active" | "completed" | "canceled";
+		products: { id: number; name: string; quantity: number; categoryName: string; price: number }[];
+	}> {
 		const conn = await db.connect();
 		try {
 			await db.query("BEGIN");
