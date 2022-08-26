@@ -20,3 +20,4 @@
 
 10- use `npm run fmt` to apply eslint rules and format all files.
 
+11- for protected routes, you need to send the token in the authorization header as `Bearer token`
