@@ -4,7 +4,7 @@ import { UserStore } from "../../models/user";
 
 const mockedCategory = { name: "test" };
 
-describe("ENDPOINT /category suite test", () => {
+describe("/category suite test", () => {
 	let userId: number;
 	let token: string;
 

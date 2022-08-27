@@ -3,7 +3,7 @@ import app from "../../server";
 import { UserStore } from "../../models/user";
 import { CategoryStore } from "../../models/category";
 
-describe("ENDPOINT /product suite test", () => {
+describe("/product suite test", () => {
 	let user: { id: number; token: string };
 	let category: { id: number; name: string };
 	let mockedProduct: { name: string; price: number; available: number; categoryId: number };

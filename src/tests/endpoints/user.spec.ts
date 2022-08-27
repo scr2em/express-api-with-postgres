@@ -4,7 +4,7 @@ import { UserStore } from "../../models/user";
 
 const mockedUser = { email: "user-endpoint-test@gmail.com", firstName: "mohamed", lastName: "ali", password: "test" };
 
-describe("ENDPOINT /user suite test", () => {
+describe("/user suite test", () => {
 	let userId: number;
 	let token: string;
 	it("POST - create a new user", async () => {

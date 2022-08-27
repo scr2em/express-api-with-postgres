@@ -3,9 +3,8 @@ import app from "../../server";
 import { UserStore } from "../../models/user";
 import { CategoryStore } from "../../models/category";
 import { ProductStore } from "../../models/product";
-import { OrderStore } from "../../models/order";
 
-describe("ENDPOINT /order suite test", () => {
+describe("/order suite test", () => {
 	let user: { id: number; token: string };
 	let category: { id: number; name: string };
 	let product: { id: number; name: string; price: number; stock: number; category_name: string };
