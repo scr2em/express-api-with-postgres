@@ -6,7 +6,18 @@
 
 3- Rename `.env.local` to `.env` and set these variables accordingly.
 
-4- Create the databases you wrote in the `.env` file  (default port 5432).
+4- Instructions for to create a database and user in postgres
+ - make sure you have `psql` in your environmental paths
+ - type `psql -U userName` in the terminal then enter the password
+ - after you log in now you can use postgres commands.
+ - `CREATE DATABASE databaseName;` for developing.
+ - `CREATE DATABASE databaseName_test;`for testing.
+ - you can create users with custom access to databases.
+ - `CREATE USER userName WITH PASSWORD 'password`.
+ - `GRANT ALL PRIVILAGES ON DATABASE databaseName TO userName`
+ - `GRANT ALL PRIVILAGES ON DATABASE databaseName_db TO userName`
+
+4- write the databases you created in the `.env` file  (default port 5432).
 
 5- Install `db-migrate` globally by using `npm i -g db-migrate`.
 
